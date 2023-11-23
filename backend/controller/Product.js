@@ -14,11 +14,10 @@ exports.createProduct = async (req, res) => {
 
 exports.fetchAllProducts = async (req, res) => {
   // filter = {"category":["smartphone","laptops"]}
-  // sort = {_sort:"price",_order="desc"}
-  // pagination = {_page:1,_limit=10}
+  // sort = {_sort: "price", _order: "desc"}
+  // pagination = {_page:1, _limit: 10}
   let condition = {};
   console.log(req.query);
- 
 
   let query = Product.find(condition);
   let totalProductsQuery = Product.find(condition);
@@ -38,20 +37,20 @@ exports.fetchAllProducts = async (req, res) => {
     });
   }
   if (req.query._sort && req.query._order) {
-    const first_sort = [ 'p', 'r', 'i', 'c', 'e' ];
-    const first_order = [ 'a', 's', 'c', 'd' ];
-    const _sort = [...req.query._sort][0]===first_sort[0]?[req.query._sort]:[...req.query._sort];
+    const first_sort = ['p', 'r', 'i', 'c', 'e'];
+    const first_order = ['a', 's', 'c', 'd'];
+    const _sort = [...req.query._sort][0] === first_sort[0] ? [req.query._sort] : [...req.query._sort];
     console.log(_sort);
-    const _order = [...req.query._order][0]===first_order[0]?[req.query._order]:[...req.query._order];
+    const _order = [...req.query._order][0] === first_order[0] ? [req.query._order] : [...req.query._order];
     console.log(_order);
     const last_sort = _sort.pop();
     const last_order = _order.pop();
     console.log(last_sort);
     console.log(last_order);
-    query = query.sort({ [last_sort]: last_order });
+    query = query.sort({ [last_sort]: last_order === 'asc' ? 1 : -1 });
   }
 
-  const totalDocs = await totalProductsQuery.count().exec();
+  const totalDocs = await totalProductsQuery.countDocuments().exec();
   console.log({ totalDocs });
 
   if (req.query._page && req.query._limit) {
@@ -68,6 +67,7 @@ exports.fetchAllProducts = async (req, res) => {
     res.status(400).json(err);
   }
 };
+
 
 exports.fetchProductById = async (req, res) => {
   const { id } = req.params;
